@@ -1,0 +1,21 @@
+---
+- name: Create User list
+  hosts: all
+  vars_files:
+   - users_list.yml
+   - users_pass.yml
+  tasks:
+  - name: Create users from given file.
+    user:
+      name: "{{item['name']}}"
+      password: "{{ db_pass  |password_hash('sha512') }}"
+    when: "{{ansible_facts.fqdn in groups['test']}} and {{item['job'] == 'dba'}}"
+    loop: "{{users}}"
+  
+  - name: Create DB users
+    user:
+      name: "{{item['name']}}"
+      password: "{{sys_pass |password_hash('sha512') }}"
+    when: "{{ansible_facts.fqdn in groups['prod']}} and {{item['job'] == 'sysadmin'}}"
+    loop: "{{users}}"
+

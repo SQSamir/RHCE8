@@ -1,0 +1,5 @@
+users:
+ - name: anar
+   job: dba
+ - name:  gunel
+   job: sysadmin
