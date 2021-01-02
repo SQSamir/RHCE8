@@ -1,0 +1,10 @@
+---
+- name: update /etc/hosts file 
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: update /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+
