@@ -1,0 +1,8 @@
+[hacluster]
+nodea.example.com
+nodeb.example.com
+nodec.example.com
+
+[storage]
+noded.example.com
+nodee.example.com

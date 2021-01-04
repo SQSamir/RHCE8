@@ -1,0 +1,49 @@
+---
+- name: Install cluster Lower Layer
+  hosts: hacluster
+  become: true
+  vars:
+    - cl_pwd: redhat
+  tasks:
+    - name: install requaired packets
+      yum: 
+        name: "{{item}}"
+        state: present
+      loop:
+      - pcs
+      - fence-agents-all
+    - name: start pcsd service
+      service:
+        name: pcsd
+        state: restarted
+        enabled: true
+    - name: add highavailability service to firewall
+      firewalld:
+        service: high-availability
+        state: enabled
+        immediate: true
+        permanent: true
+    - name: set password to hacluster user
+      user:
+        name: hacluster
+        password: "{{cl_pwd|password_hash('sha512')}}"
+    
+    - name: update /etc/hosts
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+
+    - name: Cluster authentication
+      command: 'pcs cluster auth nodea nodeb nodec -u hacluster -p redhat'
+      when: ( ansible_facts['hostname'] == 'nodea' )
+    - name: setup Cluster
+      command: 'pcs cluster setup --start --name ansiblecluster nodea nodeb nodec'
+      when: ( ansible_facts['hostname'] == 'nodea' )
+    - name: start cluster 
+      command: 'pcs cluster enable --all'
+    - name: check result
+      command: 'pcs cluster  status'
+      register: pcs_status
+    - name: show result
+      debug:
+        var: pcs_status.stdout_lines
