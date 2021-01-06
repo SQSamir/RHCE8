@@ -1,0 +1,19 @@
+---
+- name: Create logical volume
+  hosts: db
+  become: true
+  tasks:
+    - name: create LVM
+      lvol:
+        vg: firefly #this vg doesn't exist
+        lv: test
+        size: 512g
+      ignore_errors: true #avoid error 
+      register: result
+    - name: Print message
+      fail:
+        msg: Volume Group doesn't exist #msg when first task failed
+      when: "'not found' in comm_result.err"
+    - name: This task will not continue 
+      debug:
+        msg: This message will not come out.
