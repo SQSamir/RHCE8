@@ -1,0 +1,17 @@
+---
+- name: Create logical volume
+  hosts: database
+  become: true
+  tasks:
+    - name: create LVM
+      lvol:
+        vg: firefly #this vg doesn't exists
+        lv: test
+        size: 512g
+      ignore_errors: true #avoid error 
+      register: result
+    - name: Print message
+      debug:
+        msg: Nəsə alınmadı #msg when first task failed
+      when: result.rc != 0
+
