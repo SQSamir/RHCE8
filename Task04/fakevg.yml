@@ -1,6 +1,6 @@
 ---
 - name: Create logical volume
-  hosts: database
+  hosts: db
   become: true
   tasks:
     - name: create LVM
